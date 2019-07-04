@@ -1,0 +1,125 @@
+---
+title: "day4-classexercise-4c"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Question 1**
+loading chickweight
+
+```{r loadchickweight, echo = FALSE}
+ChickWeight
+```
+Plot a histogram of weight
+```{r}
+ggplot(data = ChickWeight, aes(x=weight)) + geom_histogram(bins = 200) + geom_vline(xintercept=mean(ChickWeight$weight), col="blue") + geom_vline(xintercept=median(ChickWeight$weight), col="red") 
+```
+The data shows weight is skewed and 50% of the chicks have weight less than 103.
+
+
+Scale the data using scale(). How does the plot of the histogram change?
+```{r}
+ChickWeight_scaled = mutate(ChickWeight, weight=scale(weight))
+ggplot(data = ChickWeight_scaled, aes(x=weight)) + geom_histogram(bins = 200) + geom_vline(xintercept=mean(ChickWeight_scaled$weight), col="blue") + geom_vline(xintercept=median(ChickWeight_scaled$weight), col="red") 
+```
+The plot does not actually change that much in shape. The weight is centred at (the mean is) 0. The distribution is unchanged, only the range of values has been altered.
+
+Use qqnorm() and qqline() to create quantile-quantile plots of the scaled and unscaled data. Are they different? Do you understand why?
+```{r}
+qqnorm(ChickWeight$weight)
+qqline(ChickWeight$weight, col="blue")
+```
+```{r}
+qqnorm(ChickWeight_scaled$weight)
+qqline(ChickWeight_scaled$weight, col="blue")
+```
+They are not different in shape, but the sample quintile values are different. There is no change to the shape because the data is merely scaled - it's like changing the axis, but the data is scaled linearly (take the difference between the weight and the mean, and divide that by the standard deviation). The distribution is unchanged, only the range of values has been altered.
+
+**Try using transform() to add variables that are the log and sqrt of weight. What do you see in the quantile-quantile plots of these variables?**
+```{r}
+ChickWeight_trf = transform(ChickWeight, weight_sqrt = sqrt(weight))
+ChickWeight_trf = transform(ChickWeight_trf, weight_log = log(weight))
+
+qqnorm(ChickWeight_trf$weight_sqrt)
+qqline(ChickWeight_trf$weight_sqrt, col="blue")
+
+```
+```{r}
+qqnorm(ChickWeight_trf$weight_log)
+qqline(ChickWeight_trf$weight_log, col="blue")
+```
+The line of best fit most closely matches the curve with square root of weight, and also more closely matches that of logged weight, compared to the earlier untransformed variables.
+
+**Box cox trf on weight**
+
+```{r boxcox}
+library(caret)
+boxcox = BoxCoxTrans(ChickWeight$weight, fudge = 0.05)
+ChickWeight$weight_boxcox = predict(boxcox, ChickWeight$weight)
+qqnorm(ChickWeight$weight_boxcox)
+qqline(ChickWeight$weight_boxcox, col="blue")
+```
+
+The results seem to be the same as the log transformation
+
+## **Question 2**
+
+**Generate 1000 random numbers from the normal distribution with mean = 0 and sd = 0.5. Make a quantile-quantile plot.**
+
+```{r}
+x = rnorm(1000, mean=0, sd = 0.5)
+qqnorm(x)
+qqline(x, col="blue")
+```
+**Generate 1000 random numbers from the exponential distribution with lambda = 10. Make a quantile-quantile plot.**
+
+```{r}
+x_exp = rexp(1000, rate=10)
+qqnorm(x_exp)
+qqline(x_exp, col="blue")
+```
+
+**Take the log of the exponentially distributed numbers. Make a quantile-quantile plot.**
+
+```{r}
+x_exp_log = log(x_exp, base=exp(10))
+qqnorm(x_exp_log)
+qqline(x_exp_log, col="blue")
+```
+
+## **Question 3**
+
+**Bringing it all together. Scrape the mortality rate data. Examine the distribution of the mortality rate by country (histograms and quantile-quantile plots should help). Use a transformation to normalize the data if necessary.**
+
+have not covered webscraping yet
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
