@@ -1,0 +1,134 @@
+---
+title: "day4-classexercise-4b"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+print("% for 30kg or more")
+(1-pnorm(30,mean=40,sd=3))*100
+print("% for 35-40kg")
+pnorm(40, mean=40, sd=3)*100 - pnorm(35, mean=40, sd=3)*100
+print("% for 40-45kg, is the same as above")
+print("% for less than 45kg")
+pnorm(45, mean=40, sd=3)*100
+```
+In 20 games, what is the probability exactly 5 successes?
+```{r}
+choose(20, 5) * 0.5^20
+```
+In 20 games, is the probability of at least 5 successes?
+```{r}
+x <- c(0,1,2,3,4)
+sum = 0
+for (val in x) {
+  sum = sum + choose(20, val) * 0.5^20
+}
+1- sum
+```
+Can you find a neat way to calculate the probability of between 3 and 6 successes in 20 games?
+```{r}
+sum = 0
+for (val in 3:6) {
+  sum = sum + choose(20, val) * 0.5^20
+}
+sum
+```
+Question 3
+Use dbinom() to calculate the probability of 5 successes in 20 games of dice.
+```{r}
+dbinom(5, size=20, prob=0.5)
+```
+Can you find a neat way to calculate the probability of between 3 and 6 successes?
+```{r}
+sum = 0
+for (val in 3:6) { 
+  sum = sum + dbinom(val, size=20, prob=0.5)
+}
+sum
+```
+Question 4
+Generate samples from a Poisson Distribution to simulate the Post Office queue (where people join at an average rate of 120 per hour).
+```{r}
+x = rpois(10000, 120)
+print("sample mean")
+mean(x)
+print("theoretical mean")
+120
+print("sample sd")
+sd(x)
+print("theoretical sd")
+sqrt(120)
+```
+Question 5
+Without generating samples, calculate the median interval (in seconds) between people joining the Post Office queue
+```{r}
+median(qexp(0.5, rate=1/30))
+```
+Question 6
+A casino game has a jackpot that pays out on average once every hour. Suppose that the jackpot was last triggered at 00:00.
+
+What is the probability that the next jackpot will happen between 00:00 and 01:00?
+```{r}
+ppois(0, 1, lower=FALSE)
+```
+What is the probability that the next jackpot will happen between 01:00 and 02:00?
+```{r}
+ppois(0, 1) * ppois(0, 1, lower=FALSE)
+```
+If the jackpot does not happen between 00:00 and 01:00, what is the probability that it will happen between 01:00 and 02:00?
+```{r}
+ppois(0, 1, lower=FALSE)
+```
+
+Question 7
+Choose the statistical distribution that best represents each of the following situations, and explain why:
+
+Grades in an introductory organic chemistry course.
+t dist
+The number of M&Ms of each colour in a pack.
+t dist
+The chance of drawing a card from the suit of Spades in a standard 52-card deck.
+binomial
+The number of emails received in a given hour during a workday.
+poisson
+The number of flight passengers at different gates in an airport.
+poisson
+
+
+
+
+
+
+
+
+
+
+
+
+
+

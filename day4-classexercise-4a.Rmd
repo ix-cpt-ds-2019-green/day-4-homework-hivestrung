@@ -1,0 +1,129 @@
+---
+title: "homework-day4"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+Part 2
+
+```{r}
+print(cat("Mean of precip:", mean(precip)))
+print(cat("Median of precip:", median(precip)))
+print(cat("Mean of islands:", mean(islands)))
+print(cat("Median of islands:", median(islands)))
+
+# how do I get rid of the NULL?
+```
+For islands the mean and median are very different, investigating islands with a histogram:
+```{r}
+plot(hist(islands))
+abline(v=mean(islands), col="blue")
+abline(v=median(islands), col="red")
+```
+As can be seen the median is very low while the mean is higher due to the large number of countries with small number of islands but a few outliers with thousands of islands. The data is very skewed.
+```{r}
+plot(hist(precip))
+abline(v=mean(precip), col="blue")
+abline(v=median(precip), col="red")
+```
+Here, the data follows a normal distribution more closely and the mean and median are thus similar.
+
+Part 3
+
+We will be investigating flights data for NYC, Atlanta, and San Fran
+
+Loading the flights data...
+```{r loadflights, echo=FALSE}
+library(nycflights13)
+library(tidyverse)
+flights
+flights_nyc_dep = filter(flights, origin == "JFK" | origin == "LGA")
+flights_nyc_arr = filter(flights,dest == "JFK" | dest == "LGA")
+
+flights_sf_dep = filter(flights, origin == "SFO" | origin == "OAK" | origin == "SJC")
+flights_sf_arr = filter(flights, dest == "SFO" | dest == "OAK" | dest == "SJC")
+    
+flights_atl_dep = filter(flights, origin == "ATL" | origin == "FTY")
+flights_atl_arr = filter(flights, dest == "ATL" | dest == "FTY")
+                      
+```
+
+Summarising the flight data
+
+```{r}
+print("Departure delays for NYC, SF, and ATL")
+x_dep = summary(flights_nyc_dep$dep_delay)
+y_dep = summary(flights_sf_dep$dep_delay)
+z_dep = summary(flights_atl_dep$dep_delay)
+cbind("NYC"=x_dep,"SF"=y_dep,"ATL"=z_dep)
+
+
+print("Arrival delays for NYC, SF, and ATL")
+x_arr = summary(flights_nyc_arr$arr_delay)
+y_arr = summary(flights_sf_arr$arr_delay)
+z_arr = summary(flights_atl_arr$arr_delay)
+cbind("NYC"=x_arr,"SF"=y_arr,"ATL"=z_arr)
+
+
+```
+
+We shall do boxplots to visualise the delay times for the 3 cities
+
+```{r boxplots_depdelays}
+boxplot(cbind(NYC=flights_nyc_dep$dep_delay, SF=flights_sf_dep$dep_delay, ATL=flights_atl_dep$dep_delay))
+```
+```{r boxplots_arrdelays}
+boxplot(cbind(NYC=flights_nyc$arr_delay, SF=flights_sf$arr_delay, ATL=flights_atl$arr_delay))
+```
+The data has a huge range, and the delays can be very significant, but in general (for 75% of the data) the delays are centred at 0. NYC has worse delays than SF and ATL, ATL has more variance than SF but does not have as poor delays. These apply for the arrival and departure delays, and the graphs for arrival and departure delays per airport are very similar which is surprising because they are 2 different types of delays, yet the performances of the airports are almost identical for departures and arrivals.
+
+Part 4
+
+We want to see the delay time for each NYC airport broken down by weekday
+
+For simplicity we will just consider departure times
+
+```{r prepare data}
+library(lubridate)
+
+
+flights_nyc_dep_all = flights_nyc_dep %>% mutate(dayOfWeek=weekdays(make_date(year,month,day)))
+```
+
+
+```{r}
+
+ggplot(flights_nyc_dep_all, aes(x=dep_delay, colour=dayOfWeek)) + geom_histogram(aes(fill=dayOfWeek)) + facet_grid(~origin)
+
+ggplot(flights_nyc_dep_all, aes(x=dayOfWeek, y=dep_delay, color=origin)) + geom_point(aes(fill=dayOfWeek)) + facet_grid(~origin) +theme(
+  axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+
+
+
